@@ -13,38 +13,130 @@
   </head>
   <body>
 
-    <test-fixture id="BasicTestFixture">
+    <test-fixture id="basic">
       <template>
         <mah-base58-formatter></mah-base58-formatter>
       </template>
     </test-fixture>
 
-    <test-fixture id="ChangedPropertyTestFixture">
-      <template>
-        <mah-base58-formatter prop1="new-prop1"></mah-base58-formatter>
-      </template>
-    </test-fixture>
-
     <script>
-      suite('mah-base58-formatter', function() {
+      suite('mah-base58-formatter', function () {
 
-        test('instantiating the element with default properties works', function() {
-          var element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'mah-base58-formatter');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello mah-base58-formatter!');
+        const TEST_BASE58_PAIRS = [
+          { // no Leading 0s and no Trailing 0s
+            encoded: '6UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS', 
+            decoded: [ 
+              0x3C, 0x17, 0x6E, 0x65,
+              0x9B, 0xEA, 0x16, 0x29,
+              0xA3, 0xE9, 0xBF, 0x78,
+              0x80, 0xC1, 0x12, 0xB1,
+              0xB3, 0x1B, 0x4D, 0xC8,
+              0x26, 0x26, 0x81, 0x87
+            ] 
+          }, { // 1 Leading 0 and no Trailing 0s
+            encoded: '16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS', 
+            decoded: [ 
+              0x00, 0x3C, 0x17, 0x6E,
+              0x65, 0x9B, 0xEA, 0x16,
+              0x29, 0xA3, 0xE9, 0xBF,
+              0x78, 0x80, 0xC1, 0x12,
+              0xB1, 0xB3, 0x1B, 0x4D,
+              0xC8, 0x26, 0x26, 0x81,
+              0x87 
+            ] 
+          }, { // 2 Leading 0s and no Trailing 0s
+            encoded: '116UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS', 
+            decoded: [ 
+              0x00, 0x00, 0x3C, 0x17,
+              0x6E, 0x65, 0x9B, 0xEA,
+              0x16, 0x29, 0xA3, 0xE9,
+              0xBF, 0x78, 0x80, 0xC1,
+              0x12, 0xB1, 0xB3, 0x1B,
+              0x4D, 0xC8, 0x26, 0x26,
+              0x81, 0x87
+            ] 
+          }, { // no Leading 0s and 1 Trailing 0
+            encoded: 'RBR5sSUHqVD8kGAzKFnYs35gvPmx7WQT7M', 
+            decoded: [ 
+              0x3C, 0x17, 0x6E, 0x65,
+              0x9B, 0xEA, 0x16, 0x29,
+              0xA3, 0xE9, 0xBF, 0x78,
+              0x80, 0xC1, 0x12, 0xB1,
+              0xB3, 0x1B, 0x4D, 0xC8,
+              0x26, 0x26, 0x81, 0x87,
+              0x00
+            ] 
+          }, { // no Leading 0s and 2 Trailing 0s
+            encoded: '2qiyJVdRTK1WZBwy5yaG3drBhCfXQFinWF1H', 
+            decoded: [ 
+              0x3C, 0x17, 0x6E, 0x65,
+              0x9B, 0xEA, 0x16, 0x29,
+              0xA3, 0xE9, 0xBF, 0x78,
+              0x80, 0xC1, 0x12, 0xB1,
+              0xB3, 0x1B, 0x4D, 0xC8,
+              0x26, 0x26, 0x81, 0x87,
+              0x00, 0x00
+            ] 
+          }, { // 1 Leading 0 and 1 Trailing 0
+            encoded: '1RBR5sSUHqVD8kGAzKFnYs35gvPmx7WQT7M', 
+            decoded: [ 
+              0x00, 0x3C, 0x17, 0x6E,
+              0x65, 0x9B, 0xEA, 0x16,
+              0x29, 0xA3, 0xE9, 0xBF,
+              0x78, 0x80, 0xC1, 0x12,
+              0xB1, 0xB3, 0x1B, 0x4D,
+              0xC8, 0x26, 0x26, 0x81,
+              0x87, 0x00 
+            ] 
+          }, { // 1 Leading 0 and 2 Trailing 0s
+            encoded: '12qiyJVdRTK1WZBwy5yaG3drBhCfXQFinWF1H', 
+            decoded: [
+              0x00, 0x3C, 0x17, 0x6E,
+              0x65, 0x9B, 0xEA, 0x16,
+              0x29, 0xA3, 0xE9, 0xBF,
+              0x78, 0x80, 0xC1, 0x12,
+              0xB1, 0xB3, 0x1B, 0x4D,
+              0xC8, 0x26, 0x26, 0x81,
+              0x87, 0x00, 0x00
+            ] 
+          }, { // 2 Leading 0s and 1 Trailing 0
+            encoded: '11RBR5sSUHqVD8kGAzKFnYs35gvPmx7WQT7M', 
+            decoded: [ 
+              0x00, 0x00, 0x3C, 0x17,
+              0x6E, 0x65, 0x9B, 0xEA,
+              0x16, 0x29, 0xA3, 0xE9,
+              0xBF, 0x78, 0x80, 0xC1,
+              0x12, 0xB1, 0xB3, 0x1B,
+              0x4D, 0xC8, 0x26, 0x26,
+              0x81, 0x87, 0x00
+            ] 
+          }, { // 2 Leading 0s and 2 Trailing 0s
+            encoded: '112qiyJVdRTK1WZBwy5yaG3drBhCfXQFinWF1H', 
+            decoded: [ 
+              0x00, 0x00, 0x3C, 0x17,
+              0x6E, 0x65, 0x9B, 0xEA,
+              0x16, 0x29, 0xA3, 0xE9,
+              0xBF, 0x78, 0x80, 0xC1,
+              0x12, 0xB1, 0xB3, 0x1B,
+              0x4D, 0xC8, 0x26, 0x26,
+              0x81, 0x87, 0x00, 0x00 
+            ] 
+          }
+        ];
+
+        let element = fixture ('basic');
+
+        test ('Ensure base58 encoding produces valid base58 for a given byte array', function () {
+          for (let testCase in TEST_BASE58_PAIRS) { 
+            assert.equal (basic.encode (testCase.decoded), testCase.encoded);
+          }
         });
 
-        test('setting a property on the element works', function() {
-          // Create a test fixture
-          var element = fixture('ChangedPropertyTestFixture');
-          assert.equal(element.prop1, 'new-prop1');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
+        test ('Ensure base58 decoded produces valid byte arrays for a given base58 string', function () {
+          for (let testCase in TEST_BASE58_PAIRS) { 
+            assert.equal (basic.decode (testCase.encoded), testCase.decoded);
+          }
         });
-
       });
     </script>
 
