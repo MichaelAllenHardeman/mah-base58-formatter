@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="mah-base58-formatter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `mah-base58-formatter`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class MahBase58Formatter extends Polymer.Element {
+      static get is() { return 'mah-base58-formatter'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'mah-base58-formatter'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(MahBase58Formatter.is, MahBase58Formatter);
+  </script>
+</dom-module>
