@@ -127,15 +127,15 @@
         let element = fixture ('basic');
 
         test ('Ensure base58 encoding produces valid base58 for a given byte array', function () {
-          for (let testCase in TEST_BASE58_PAIRS) { 
-            assert.equal (basic.encode (testCase.decoded), testCase.encoded);
-          }
+          TEST_BASE58_PAIRS.forEach ((testCase) => { 
+            assert.equal (element.encode (testCase.decoded), testCase.encoded);
+          });
         });
 
         test ('Ensure base58 decoded produces valid byte arrays for a given base58 string', function () {
-          for (let testCase in TEST_BASE58_PAIRS) { 
-            assert.equal (basic.decode (testCase.encoded), testCase.decoded);
-          }
+          TEST_BASE58_PAIRS.forEach ((testCase) => {
+            assert.deepEqual (element.decode (testCase.encoded), testCase.decoded)
+          });
         });
       });
     </script>
