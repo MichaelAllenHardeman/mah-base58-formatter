@@ -1,13 +1,15 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="mah-base58-formatting-mixin.html">
 
 <dom-module id="mah-base58-formatter">
   <template>
     <style>
       :host {
-        display: block;
+        display: inline-block;
+        @apply mah-base58-formatter;
       }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    [[output]]
   </template>
 
   <script>
@@ -19,16 +21,8 @@
      * @polymer
      * @demo demo/index.html
      */
-    class MahBase58Formatter extends Polymer.Element {
+    class MahBase58Formatter extends MahBase58FormattingMixin (Polymer.Element) {
       static get is() { return 'mah-base58-formatter'; }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: 'mah-base58-formatter'
-          }
-        };
-      }
     }
 
     window.customElements.define(MahBase58Formatter.is, MahBase58Formatter);
