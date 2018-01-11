@@ -19,7 +19,7 @@
         let bytes = JSON.parse (JSON.stringify (byteArray));
         let zeros = 0;
         while (bytes.length && 0 === bytes [0]) { bytes.shift (); zeros++; }
-        let b58Codes = new Array (Math.floor (bytes.length * 138 / 100)).fill (0);
+        let b58Codes = new Array (Math.floor (bytes.length * 138 / 100 + 1)).fill (0);
         let length = 0;
         bytes.forEach ((byte) => {
           let carry = byte;
@@ -31,6 +31,7 @@
           }
           length = i;
         });
+        while (b58Codes.length && 0 === b58Codes [0]) { b58Codes.shift (); }
         let output = b58Codes.reduce ((b58String, code) => {
           return b58String + this.alphabet.charAt (code);
         }, '');
@@ -41,7 +42,7 @@
         let base58 = base58String.trim();
         let ones = 0;
         while (base58.length && '1' === base58.charAt (0)) { base58 = base58.substr (1); ones++; }
-        let bytes = new Array (Math.floor (base58.length * 733 / 1000)).fill (0);
+        let bytes = new Array (Math.floor (base58.length * 733 / 1000 + 1)).fill (0);
         let length = 0;
         for (let i = 0; i < base58.length; i++) {
           let b58code = this.alphabet.indexOf (base58.charAt (i));
@@ -55,6 +56,7 @@
           }
           length = j;
         }
+        while (bytes.length && 0 === bytes [0]) { bytes.shift (); }
         return ((new Array(ones).fill(0)).concat(bytes));
       }
 
