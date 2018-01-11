@@ -1,18 +1,61 @@
 <script>
   MahBase58FormattingMixin = function (superClass) {
+
     return class extends superClass {
       constructor () { super (); }
 
       static get properties () {
-        return {};
+        return {
+
+          alphabet: {
+            type: String,
+            value: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+          }
+
+        };
       }
 
       encode (byteArray) {
-        return '';
+        let bytes = JSON.parse (JSON.stringify (byteArray));
+        let zeros = 0;
+        while (bytes.length && 0 === bytes [0]) { bytes.shift (); zeros++; }
+        let b58Codes = new Array (Math.floor (bytes.length * 138 / 100)).fill (0);
+        let length = 0;
+        bytes.forEach ((byte) => {
+          let carry = byte;
+          let i = 0;
+          for (let it = b58Codes.length - 1; (0 !== carry || i < length) && (0 <= it); i++, it--) {
+            carry += 256 * b58Codes [it];
+            b58Codes [it] = carry % 58;
+            carry = Math.floor (carry / 58);
+          }
+          length = i;
+        });
+        let output = b58Codes.reduce ((b58String, code) => {
+          return b58String + this.alphabet.charAt (code);
+        }, '');
+        return ((new Array(zeros + 1).join('1')) + output);
       }
 
-      decode (base58) {
-        return [];
+      decode (base58String) {
+        let base58 = base58String.trim();
+        let ones = 0;
+        while (base58.length && '1' === base58.charAt (0)) { base58 = base58.substr (1); ones++; }
+        let bytes = new Array (Math.floor (base58.length * 733 / 1000)).fill (0);
+        let length = 0;
+        for (let i = 0; i < base58.length; i++) {
+          let b58code = this.alphabet.indexOf (base58.charAt (i));
+          if (-1 === b58code) { throw new Error ('Malformed Base58'); }
+          let carry = b58code;
+          let j = 0;
+          for (let it = bytes.length - 1; (0 !== carry || j < length) && (it >= 0); --it, ++j) {
+            carry += 58 * bytes [it];
+            bytes [it] = carry % 256;
+            carry = Math.floor (carry / 256);
+          }
+          length = j;
+        }
+        return ((new Array(ones).fill(0)).concat(bytes));
       }
 
     }
